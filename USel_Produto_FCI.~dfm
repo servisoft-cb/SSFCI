@@ -89,7 +89,7 @@ object frmSel_Produto_FCI: TfrmSel_Produto_FCI
     Left = 0
     Top = 50
     Width = 980
-    Height = 373
+    Height = 374
     Align = alClient
     Ctl3D = False
     DataSource = DMFCI.dsSel_Produto
@@ -195,7 +195,7 @@ object frmSel_Produto_FCI: TfrmSel_Produto_FCI
   end
   object Panel1: TPanel
     Left = 0
-    Top = 423
+    Top = 424
     Width = 980
     Height = 46
     Align = alBottom

@@ -11,7 +11,7 @@ object DMFCI: TDMFCI
     CommandText = 'SELECT *'#13#10'FROM FILIAL'
     MaxBlobSize = -1
     Params = <>
-    SQLConnection = DmDatabase.scoDados
+    SQLConnection = dmDatabase.scoDados
     Left = 720
     Top = 16
   end
@@ -91,7 +91,7 @@ object DMFCI: TDMFCI
     SQL.Strings = (
       'SELECT *'
       'FROM PARAMETROS_FCI')
-    SQLConnection = DmDatabase.scoDados
+    SQLConnection = dmDatabase.scoDados
     Left = 568
     Top = 136
     object qParametros_FCIID: TIntegerField
@@ -117,7 +117,7 @@ object DMFCI: TDMFCI
       'r (P.tipo_reg = '#39'S'#39'))'#13#10'  AND P.gerar_fci = '#39'S'#39
     MaxBlobSize = -1
     Params = <>
-    SQLConnection = DmDatabase.scoDados
+    SQLConnection = dmDatabase.scoDados
     Left = 720
     Top = 72
   end
@@ -333,7 +333,7 @@ object DMFCI: TDMFCI
       '))'#13#10'  AND P.gerar_fci = '#39'S'#39#13#10#13#10#13#10#13#10#13#10
     MaxBlobSize = -1
     Params = <>
-    SQLConnection = DmDatabase.scoDados
+    SQLConnection = dmDatabase.scoDados
     Left = 712
     Top = 152
   end
@@ -587,7 +587,7 @@ object DMFCI: TDMFCI
         Name = 'ID_PRODUTO'
         ParamType = ptInput
       end>
-    SQLConnection = DmDatabase.scoDados
+    SQLConnection = dmDatabase.scoDados
     Left = 712
     Top = 208
   end
@@ -722,7 +722,7 @@ object DMFCI: TDMFCI
         Name = 'ID_PRODUTO'
         ParamType = ptInput
       end>
-    SQLConnection = DmDatabase.scoDados
+    SQLConnection = dmDatabase.scoDados
     Left = 712
     Top = 264
   end
@@ -763,7 +763,7 @@ object DMFCI: TDMFCI
     CommandText = 'SELECT *'#13#10'FROM FCI'#13#10
     MaxBlobSize = -1
     Params = <>
-    SQLConnection = DmDatabase.scoDados
+    SQLConnection = dmDatabase.scoDados
     Left = 56
     Top = 16
     object sdsFCIID: TIntegerField
@@ -836,7 +836,7 @@ object DMFCI: TDMFCI
         Name = 'ID_FCI'
         ParamType = ptInput
       end>
-    SQLConnection = DmDatabase.scoDados
+    SQLConnection = dmDatabase.scoDados
     Left = 56
     Top = 72
     object sdsProduto_FCIID: TIntegerField
@@ -924,7 +924,7 @@ object DMFCI: TDMFCI
     CommandText = 'SELECT *'#13#10'FROM FCI'#13#10
     MaxBlobSize = -1
     Params = <>
-    SQLConnection = DmDatabase.scoDados
+    SQLConnection = dmDatabase.scoDados
     Left = 336
     Top = 24
   end
