@@ -526,65 +526,85 @@ object DMFCI: TDMFCI
     NoMetadata = True
     GetMetadata = False
     CommandText = 
-      'SELECT pc.id, PC.id_material, PC.qtd_consumo, MAT.unidade, MAT.o' +
-      'rigem_prod, '#13#10'MAT.preco_custo, MAT.referencia REFERENCIA_MAT, MA' +
-      'T.NOME NOME_MAT,'#13#10'    (select COALESCE(SUM(ENT.QTD * ENT.VLR_UNI' +
-      'TARIO) / SUM(ENT.QTD),0)'#13#10'      FROM estoque_mov ENT'#13#10'      WHER' +
-      'E ENT.tipo_es = '#39'E'#39#13#10'        AND ENT.gerar_custo = '#39'S'#39#13#10'        ' +
-      'AND ENT.ID_PRODUTO = PC.id_material'#13#10'        AND ENT.FILIAL = :F' +
-      'ILIAL'#13#10'        AND ENT.DTMOVIMENTO < :DATA1) VLR_MEDIO_ANT,'#13#10'   ' +
-      ' (select COALESCE(SUM(ENT.QTD * ENT.VLR_UNITARIO) / SUM(ENT.QTD)' +
-      ',0)'#13#10'      FROM estoque_mov ENT'#13#10'      WHERE ENT.tipo_es = '#39'E'#39#13#10 +
-      '        AND ENT.gerar_custo = '#39'S'#39#13#10'        AND ENT.ID_PRODUTO = ' +
-      'PC.id_material'#13#10'        AND ENT.FILIAL = :FILIAL'#13#10'        AND EN' +
-      'T.DTMOVIMENTO BETWEEN :DATA1 AND :DATA2) VLR_MEDIO_PEN,'#13#10'    (se' +
-      'lect COALESCE(SUM(ENT.QTD * ENT.VLR_UNITARIO) / SUM(ENT.QTD),0)'#13 +
-      #10'      FROM estoque_mov ENT'#13#10'      WHERE ENT.tipo_es = '#39'E'#39#13#10'    ' +
-      '    AND ENT.gerar_custo = '#39'S'#39#13#10'        AND ENT.ID_PRODUTO = PC.i' +
-      'd_material'#13#10'        AND ENT.FILIAL = :FILIAL'#13#10'        AND ENT.DT' +
-      'MOVIMENTO > :DATA2) VLR_MEDIO_NOV'#13#10'FROM PRODUTO_CONSUMO PC'#13#10'INNE' +
-      'R JOIN PRODUTO MAT'#13#10'ON PC.id_material = MAT.id'#13#10'WHERE PC.id = :I' +
-      'D_PRODUTO'#13#10
+      'select AUX.ID, AUX.QTD_CONSUMO, AUX.ID_MATERIAL, AUX.UNIDADE, AU' +
+      'X.ORIGEM_PROD, AUX.PRECO_CUSTO, AUX.REFERENCIA_MAT,'#13#10'       AUX.' +
+      'NOME_MAT, iif(coalesce(VLR_ANT, 0) > 0, AUX.VLR_ANT / AUX.QTD_AN' +
+      'T, 0) VLR_MEDIO_ANT,'#13#10'       iif(coalesce(VLR_PEN, 0) > 0, AUX.V' +
+      'LR_PEN / AUX.QTD_PEN, 0) VLR_MEDIO_PEN,'#13#10'       iif(coalesce(VLR' +
+      '_NOV, 0) > 0, AUX.VLR_NOV / AUX.QTD_NOV, 0) VLR_MEDIO_NOV'#13#10'from ' +
+      '('#13#10'with A'#13#10'as (select AUX.ID, sum(AUX.QTD_CONSUMO) QTD_CONSUMO, ' +
+      'AUX.ID_MATERIAL'#13#10'    from (select PC.ID, PC.QTD_CONSUMO,'#13#10'      ' +
+      '           case'#13#10'                   when MAT.ID_MATERIAL_CRU > 0' +
+      ' then MAT.ID_MATERIAL_CRU'#13#10'                   else PC.ID_MATERIA' +
+      'L'#13#10'                 end ID_MATERIAL'#13#10'          from PRODUTO_CONS' +
+      'UMO PC'#13#10'          inner join PRODUTO MAT on PC.ID_MATERIAL = MAT' +
+      '.ID'#13#10'          where PC.ID = :ID_PRODUTO) AUX'#13#10'    group by AUX.' +
+      'ID, AUX.ID_MATERIAL)  '#13#10'select A.ID, A.QTD_CONSUMO, A.ID_MATERIA' +
+      'L, MAT.UNIDADE, MAT.ORIGEM_PROD, MAT.PRECO_CUSTO, MAT.REFERENCIA' +
+      ' REFERENCIA_MAT,'#13#10'       MAT.NOME NOME_MAT, sum(iif(ENT.DTMOVIME' +
+      'NTO < :DATA1,'#13#10'       (ENT.QTD * ENT.VLR_UNITARIO), 0)) VLR_ANT,' +
+      ' sum(iif(ENT.DTMOVIMENTO < :DATA1,'#13#10'       (ENT.QTD), 0)) QTD_AN' +
+      'T, sum(iif(ENT.DTMOVIMENTO between :DATA1 and :DATA2,'#13#10'       (E' +
+      'NT.QTD * ENT.VLR_UNITARIO), 0)) VLR_PEN, sum(iif(ENT.DTMOVIMENTO' +
+      ' between :DATA1 and :DATA2,'#13#10'       (ENT.QTD), 0)) QTD_PEN, sum(' +
+      'iif(ENT.DTMOVIMENTO > :DATA2,'#13#10'       (ENT.QTD * ENT.VLR_UNITARI' +
+      'O), 0)) VLR_NOV, sum(iif(ENT.DTMOVIMENTO > :DATA2,'#13#10'       (ENT.' +
+      'QTD), 0)) QTD_NOV'#13#10'from A'#13#10'inner join PRODUTO MAT on A.ID_MATERI' +
+      'AL = MAT.ID'#13#10'left join ESTOQUE_MOV ENT on ENT.TIPO_ES = '#39'E'#39' and ' +
+      'ENT.GERAR_CUSTO = '#39'S'#39' and ENT.ID_PRODUTO = A.ID_MATERIAL and ENT' +
+      '.FILIAL = :FILIAL'#13#10'group by A.ID, A.QTD_CONSUMO, A.ID_MATERIAL, ' +
+      'MAT.UNIDADE, MAT.ORIGEM_PROD, MAT.PRECO_CUSTO, MAT.REFERENCIA, M' +
+      'AT.NOME) AUX'#13#10#13#10
     MaxBlobSize = -1
     Params = <
       item
         DataType = ftInteger
-        Name = 'FILIAL'
-        ParamType = ptInput
-      end
-      item
-        DataType = ftDate
-        Name = 'DATA1'
-        ParamType = ptInput
-      end
-      item
-        DataType = ftInteger
-        Name = 'FILIAL'
-        ParamType = ptInput
-      end
-      item
-        DataType = ftDate
-        Name = 'DATA1'
-        ParamType = ptInput
-      end
-      item
-        DataType = ftDate
-        Name = 'DATA2'
-        ParamType = ptInput
-      end
-      item
-        DataType = ftInteger
-        Name = 'FILIAL'
-        ParamType = ptInput
-      end
-      item
-        DataType = ftDate
-        Name = 'DATA2'
-        ParamType = ptInput
-      end
-      item
-        DataType = ftInteger
         Name = 'ID_PRODUTO'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftDate
+        Name = 'DATA1'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftDate
+        Name = 'DATA1'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftDate
+        Name = 'DATA1'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftDate
+        Name = 'DATA2'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftDate
+        Name = 'DATA1'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftDate
+        Name = 'DATA2'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftDate
+        Name = 'DATA2'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftDate
+        Name = 'DATA2'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftInteger
+        Name = 'FILIAL'
         ParamType = ptInput
       end>
     SQLConnection = DmDatabase.scoDados
